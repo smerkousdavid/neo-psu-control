@@ -9,7 +9,8 @@ $(function() {
         self.scripts_gcode_psucontrol_post_on = ko.observable(undefined);
         self.scripts_gcode_psucontrol_pre_off = ko.observable(undefined);
 
-        self.hasGPIO = ko.observable(true);
+        self.hasRPiGPIO = ko.observable(true);
+        self.availableGPIODevices = ko.observableArray();
         self.isPSUOn = ko.observable(undefined);
 
         self.psu_indicator = $("#psucontrol_indicator");
@@ -66,9 +67,14 @@ $(function() {
             if (plugin != "psucontrol") {
                 return;
             }
+console.log(data);
+            if (data.hasRPiGPIO !== undefined) {
+                self.hasRPiGPIO(data.hasRPiGPIO);
+            }
 
-            if (data.hasGPIO !== undefined) {
-                self.hasGPIO(data.hasGPIO);
+
+            if (data.availableGPIODevices !== undefined) {
+                self.availableGPIODevices(data.availableGPIODevices);
             }
 
             if (data.isPSUOn !== undefined) {

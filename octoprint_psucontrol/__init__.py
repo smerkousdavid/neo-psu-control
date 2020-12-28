@@ -79,9 +79,9 @@ class PSUControl(octoprint.plugin.StartupPlugin,
         try:
             global GPIO
             import RPi.GPIO as GPIO
-            self._hasGPIO = True
+            self._hasRPiGPIO = True
         except (ImportError, RuntimeError):
-            self._hasGPIO = False
+            self._hasRPiGPIO = False
 
         self._pin_to_gpio_rev1 = [-1, -1, -1, 0, -1, 1, -1, 4, 14, -1, 15, 17, 18, 21, -1, 22, 23, -1, 24, 10, -1, 9, 25, 11, 8, -1, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ]
         self._pin_to_gpio_rev2 = [-1, -1, -1, 2, -1, 3, -1, 4, 14, -1, 15, 17, 18, 27, -1, 22, 23, -1, 24, 10, -1, 9, 25, 11, 8, -1, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 ]
@@ -275,7 +275,7 @@ class PSUControl(octoprint.plugin.StartupPlugin,
             return 0
 
     def _configure_gpio(self):
-        if not self._hasGPIO:
+        if not self._hasRPiGPIO:
             self._logger.error("RPi.GPIO is required.")
             return
         
@@ -339,7 +339,7 @@ class PSUControl(octoprint.plugin.StartupPlugin,
             old_isPSUOn = self.isPSUOn
 
             if self.sensingMethod == 'GPIO':
-                if not self._hasGPIO:
+                if not self._hasRPiGPIO:
                     return
 
                 self._logger.debug("Polling PSU state...")
@@ -535,7 +535,7 @@ class PSUControl(octoprint.plugin.StartupPlugin,
 
                 self._logger.debug("On system command returned: %s" % r)
             elif self.switchingMethod == 'GPIO':
-                if not self._hasGPIO:
+                if not self._hasRPiGPIO:
                     return
 
                 self._logger.debug("Switching PSU On Using GPIO: %s" % self.onoffGPIOPin)
@@ -583,7 +583,7 @@ class PSUControl(octoprint.plugin.StartupPlugin,
 
                 self._logger.debug("Off system command returned: %s" % r)
             elif self.switchingMethod == 'GPIO':
-                if not self._hasGPIO:
+                if not self._hasRPiGPIO:
                     return
 
                 self._logger.debug("Switching PSU Off Using GPIO: %s" % self.onoffGPIOPin)
@@ -608,7 +608,7 @@ class PSUControl(octoprint.plugin.StartupPlugin,
 
     def on_event(self, event, payload):
         if event == Events.CLIENT_OPENED:
-            self._plugin_manager.send_plugin_message(self._identifier, dict(hasGPIO=self._hasGPIO, isPSUOn=self.isPSUOn))
+            self._plugin_manager.send_plugin_message(self._identifier, dict(hasRPiGPIO=self._hasRPiGPIO, isPSUOn=self.isPSUOn))
             return
 
     def get_api_commands(self):

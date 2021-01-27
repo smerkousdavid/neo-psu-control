@@ -712,11 +712,13 @@ class PSUControl(octoprint.plugin.StartupPlugin,
 
         if 'scripts_gcode_psucontrol_post_on' in data:
             script = data["scripts_gcode_psucontrol_post_on"]
-            self._settings.saveScript("gcode", "psucontrol_post_on", u'' + script.replace("\r\n", "\n").replace("\r", "\n"))
+            if script:
+                self._settings.saveScript("gcode", "psucontrol_post_on", u'' + script.replace("\r\n", "\n").replace("\r", "\n"))
 
         if 'scripts_gcode_psucontrol_pre_off' in data:
             script = data["scripts_gcode_psucontrol_pre_off"]
-            self._settings.saveScript("gcode", "psucontrol_pre_off", u'' + script.replace("\r\n", "\n").replace("\r", "\n"))
+            if script:
+                self._settings.saveScript("gcode", "psucontrol_pre_off", u'' + script.replace("\r\n", "\n").replace("\r", "\n"))
 
         #GCode switching and PseudoOnOff are not compatible.
         if self.switchingMethod == 'GCODE' and self.enablePseudoOnOff:

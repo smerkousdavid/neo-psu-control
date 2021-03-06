@@ -5,7 +5,7 @@ import setuptools
 
 plugin_identifier = "neopsucontrol"
 plugin_package = "octoprint_%s" % plugin_identifier
-plugin_name = "neo-psu-control"
+plugin_name = "neopsucontrol"
 plugin_version = "0.1.11"
 plugin_description = "Control ATX/AUX power supply."
 plugin_author = "Shawn Bruce (modified by David Smerkous)"

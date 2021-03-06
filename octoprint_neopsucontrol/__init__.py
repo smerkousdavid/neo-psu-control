@@ -70,7 +70,7 @@ class Gpio:
                 self.current += 1
             except:
                 sleep(0.000001)
-        print "Neo gpios started, make sure arduino isn't using the same pins or you can ruin this board!"
+        print("Neo gpios started, make sure arduino isn't using the same pins or you can ruin this board!")
 
     def pinMode(self, pin=2, direction=0):
         try:
@@ -81,10 +81,10 @@ class Gpio:
                 self.gpiodir[pin] = (0 if direction < 1 else 1)
             return True
         except ValueError:
-            print "ERROR: pinMode, value inserted wasn't an int"
+            print("ERROR: pinMode, value inserted wasn't an int")
             return False
         except:
-            print "ERROR: pinMode, error using pinMode"
+            print("ERROR: pinMode, error using pinMode")
             return False
 
     def digitalWrite(self, pin=2, value=0):
@@ -100,10 +100,10 @@ class Gpio:
                 self.gpioval[pin] = (0 if value < 1 else 1)
             return True
         except ValueError:
-            print "ERROR: digitalWrite, value inserted wasn't an int"
+            print("ERROR: digitalWrite, value inserted wasn't an int")
             return False
         except:
-            print "ERROR: digitalWrite, error running"
+            print("ERROR: digitalWrite, error running")
             return False
 
     def digitalRead(self, pin=2, redirect=True):
@@ -117,10 +117,10 @@ class Gpio:
                 self.gpioval[pin] = int(reader.read().replace('\n', ''))
             return self.gpioval[pin]
         except ValueError:
-            print "ERROR: digitalRead, value inserted wasn't an int"
+            print("ERROR: digitalRead, value inserted wasn't an int")
             return -1
         except:
-            print "ERROR: digitalRead, error running"
+            print("ERROR: digitalRead, error running")
             return -1
 
 
@@ -178,7 +178,7 @@ except:
                 self.on_reset()
 
 
-class PSUControl(octoprint.plugin.StartupPlugin,
+class NeoPSUControl(octoprint.plugin.StartupPlugin,
                  octoprint.plugin.TemplatePlugin,
                  octoprint.plugin.AssetPlugin,
                  octoprint.plugin.SettingsPlugin,
@@ -325,12 +325,12 @@ class PSUControl(octoprint.plugin.StartupPlugin,
         self._logger.debug("idleTimeoutWaitTemp: %s" % self.idleTimeoutWaitTemp)
 
         scripts = self._settings.listScripts("gcode")
-        if not "psucontrol_post_on" in scripts:
-            self._settings.saveScript("gcode", "psucontrol_post_on", u'')
+        if not "neopsucontrol_post_on" in scripts:
+            self._settings.saveScript("gcode", "neopsucontrol_post_on", u'')
 
         scripts = self._settings.listScripts("gcode")
-        if not "psucontrol_pre_off" in scripts:
-            self._settings.saveScript("gcode", "psucontrol_pre_off", u'')
+        if not "neopsucontrol_pre_off" in scripts:
+            self._settings.saveScript("gcode", "neopsucontrol_pre_off", u'')
 
         if self.switchingMethod == 'GCODE':
             self._logger.info("Using G-Code Commands for On/Off")
@@ -356,7 +356,7 @@ class PSUControl(octoprint.plugin.StartupPlugin,
         self._start_idle_timer()
 
     def _gpio_board_to_bcm(self, pin):
-        return self._pin_to_gpio.gpios[pin]
+        return pin # self._pin_to_gpio.gpios[pin]
         #if GPIO.RPI_REVISION == 1:
         #    pin_to_gpio = self._pin_to_gpio_rev1
         #elif GPIO.RPI_REVISION == 2:
@@ -373,7 +373,7 @@ class PSUControl(octoprint.plugin.StartupPlugin,
         #else:
         #    pin_to_gpio = self._pin_to_gpio_rev3
 
-        return self._pin_to_gpio.gpios.index(pin)
+        return pin # self._pin_to_gpio.gpios.index(pin)
         # return pin_to_gpio.index(pin)
 
     def _gpio_get_pin(self, pin):
@@ -591,11 +591,11 @@ class PSUControl(octoprint.plugin.StartupPlugin,
             if self.enablePseudoOnOff:
                 if gcode == self.pseudoOnGCodeCommand:
                     self.turn_psu_on()
-                    comm_instance._log("PSUControl: ok")
+                    comm_instance._log("NeoPSUControl: ok")
                     skipQueuing = True
                 elif gcode == self.pseudoOffGCodeCommand:
                     self.turn_psu_off()
-                    comm_instance._log("PSUControl: ok")
+                    comm_instance._log("NwoPSUControl: ok")
                     skipQueuing = True
 
             if (not self.isPSUOn and self.autoOn and (gcode in self._autoOnTriggerGCodeCommandsArray)):
@@ -632,12 +632,12 @@ class PSUControl(octoprint.plugin.StartupPlugin,
 
                 self._logger.debug("Switching PSU On Using GPIO: %s" % self.onoffGPIOPin)
                 if not self.invertonoffGPIOPin:
-                    pin_output=GPIO.HIGH
+                    pin_output=self._gpios.HIGH
                 else:
-                    pin_output=GPIO.LOW
+                    pin_output=self._gpios.LOW
 
                 try:
-                    GPIO.output(self._gpio_get_pin(self.onoffGPIOPin), pin_output)
+                    self._gpios.digitalWrite(self._gpio_get_pin(self.onoffGPIOPin), pin_output)
                 except (RuntimeError, ValueError) as e:
                     self._logger.error(e)
 
@@ -653,12 +653,12 @@ class PSUControl(octoprint.plugin.StartupPlugin,
                 time.sleep(0.1)
 
             if not self._printer.is_closed_or_error():
-                self._printer.script("psucontrol_post_on", must_be_set=False)
+                self._printer.script("neopsucontrol_post_on", must_be_set=False)
 
     def turn_psu_off(self):
         if self.switchingMethod == 'GCODE' or self.switchingMethod == 'GPIO' or self.switchingMethod == 'SYSTEM':
             if not self._printer.is_closed_or_error():
-                self._printer.script("psucontrol_pre_off", must_be_set=False)
+                self._printer.script("neopsucontrol_pre_off", must_be_set=False)
 
             self._logger.info("Switching PSU Off")
             if self.switchingMethod == 'GCODE':
@@ -877,26 +877,26 @@ class PSUControl(octoprint.plugin.StartupPlugin,
 
     def get_assets(self):
         return {
-            "js": ["js/psucontrol.js"],
-            "less": ["less/psucontrol.less"],
-            "css": ["css/psucontrol.min.css"]
+            "js": ["js/neopsucontrol.js"],
+            "less": ["less/neopsucontrol.less"],
+            "css": ["css/neopsucontrol.min.css"]
 
         }
 
     def get_update_information(self):
         return dict(
-            psucontrol=dict(
-                displayName="PSU Control",
+            neopsucontrol=dict(
+                displayName="NEO PSU Control",
                 displayVersion=self._plugin_version,
 
                 # version check: github repository
                 type="github_release",
-                user="kantlivelong",
-                repo="OctoPrint-PSUControl",
+                user="smerkous",
+                repo="neo-psu-control",
                 current=self._plugin_version,
 
                 # update method: pip w/ dependency links
-                pip="https://github.com/kantlivelong/OctoPrint-PSUControl/archive/{target_version}.zip"
+                pip="https://smerkousdavid/neo-psu-control/archive/{target_version}.zip"
             )
         )
 
@@ -905,7 +905,7 @@ __plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_load__():
     global __plugin_implementation__
-    __plugin_implementation__ = PSUControl()
+    __plugin_implementation__ = NeoPSUControl()
 
     global __plugin_hooks__
     __plugin_hooks__ = {

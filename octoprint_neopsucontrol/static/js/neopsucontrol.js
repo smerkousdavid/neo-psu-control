@@ -1,45 +1,45 @@
 $(function() {
-    function PSUControlViewModel(parameters) {
+    function NeoPSUControlViewModel(parameters) {
         var self = this;
 
         self.settingsViewModel = parameters[0]
         self.loginState = parameters[1];
         
         self.settings = undefined;
-        self.scripts_gcode_psucontrol_post_on = ko.observable(undefined);
-        self.scripts_gcode_psucontrol_pre_off = ko.observable(undefined);
+        self.scripts_gcode_neopsucontrol_post_on = ko.observable(undefined);
+        self.scripts_gcode_neopsucontrol_pre_off = ko.observable(undefined);
 
         self.hasGPIO = ko.observable(true);
         self.isPSUOn = ko.observable(undefined);
 
-        self.psu_indicator = $("#psucontrol_indicator");
+        self.psu_indicator = $("#neopsucontrol_indicator");
 
         self.onBeforeBinding = function() {
             self.settings = self.settingsViewModel.settings;
         };
 
         self.onSettingsShown = function () {
-            self.scripts_gcode_psucontrol_post_on(self.settings.scripts.gcode["psucontrol_post_on"]());
-            self.scripts_gcode_psucontrol_pre_off(self.settings.scripts.gcode["psucontrol_pre_off"]());
+            self.scripts_gcode_neopsucontrol_post_on(self.settings.scripts.gcode["neopsucontrol_post_on"]());
+            self.scripts_gcode_neopsucontrol_pre_off(self.settings.scripts.gcode["neopsucontrol_pre_off"]());
         };
 
         self.onSettingsHidden = function () {
-            self.settings.plugins.psucontrol.scripts_gcode_psucontrol_post_on = null;
-            self.settings.plugins.psucontrol.scripts_gcode_psucontrol_pre_off = null;
+            self.settings.plugins.neopsucontrol.scripts_gcode_neopsucontrol_post_on = null;
+            self.settings.plugins.neopsucontrol.scripts_gcode_neopsucontrol_pre_off = null;
         };
 
         self.onSettingsBeforeSave = function () {
-            if (self.scripts_gcode_psucontrol_post_on() !== undefined) {
-                if (self.scripts_gcode_psucontrol_post_on() != self.settings.scripts.gcode["psucontrol_post_on"]()) {
-                    self.settings.plugins.psucontrol.scripts_gcode_psucontrol_post_on = self.scripts_gcode_psucontrol_post_on;
-                    self.settings.scripts.gcode["psucontrol_post_on"](self.scripts_gcode_psucontrol_post_on());
+            if (self.scripts_gcode_neopsucontrol_post_on() !== undefined) {
+                if (self.scripts_gcode_neopsucontrol_post_on() != self.settings.scripts.gcode["neopsucontrol_post_on"]()) {
+                    self.settings.plugins.neopsucontrol.scripts_gcode_neopsucontrol_post_on = self.scripts_gcode_neopsucontrol_post_on;
+                    self.settings.scripts.gcode["neopsucontrol_post_on"](self.scripts_gcode_neopsucontrol_post_on());
                 }
             }
 
-            if (self.scripts_gcode_psucontrol_pre_off() !== undefined) {
-                if (self.scripts_gcode_psucontrol_pre_off() != self.settings.scripts.gcode["psucontrol_pre_off"]()) {
-                    self.settings.plugins.psucontrol.scripts_gcode_psucontrol_pre_off = self.scripts_gcode_psucontrol_pre_off;
-                    self.settings.scripts.gcode["psucontrol_pre_off"](self.scripts_gcode_psucontrol_pre_off());
+            if (self.scripts_gcode_neopsucontrol_pre_off() !== undefined) {
+                if (self.scripts_gcode_neopsucontrol_pre_off() != self.settings.scripts.gcode["neopsucontrol_pre_off"]()) {
+                    self.settings.plugins.neopsucontrol.scripts_gcode_neopsucontrol_pre_off = self.scripts_gcode_neopsucontrol_pre_off;
+                    self.settings.scripts.gcode["neopsucontrol_pre_off"](self.scripts_gcode_neopsucontrol_pre_off());
                 }
             }
         };
@@ -54,7 +54,7 @@ $(function() {
             });
             
             $.ajax({
-                url: API_BASEURL + "plugin/psucontrol",
+                url: API_BASEURL + "plugin/neopsucontrol",
                 type: "POST",
                 dataType: "json",
                 data: JSON.stringify({
@@ -67,7 +67,7 @@ $(function() {
         }
 
         self.onDataUpdaterPluginMessage = function(plugin, data) {
-            if (plugin != "psucontrol") {
+            if (plugin != "neopsucontrol") {
                 return;
             }
 
@@ -82,7 +82,7 @@ $(function() {
 
         self.togglePSU = function() {
             if (self.isPSUOn()) {
-                if (self.settings.plugins.psucontrol.enablePowerOffWarningDialog()) {
+                if (self.settings.plugins.neopsucontrol.enablePowerOffWarningDialog()) {
                     showConfirmationDialog({
                         message: "You are about to turn off the PSU.",
                         onproceed: function() {
@@ -99,7 +99,7 @@ $(function() {
 
         self.turnPSUOn = function() {
             $.ajax({
-                url: API_BASEURL + "plugin/psucontrol",
+                url: API_BASEURL + "plugin/neopsucontrol",
                 type: "POST",
                 dataType: "json",
                 data: JSON.stringify({
@@ -111,7 +111,7 @@ $(function() {
 
     	self.turnPSUOff = function() {
             $.ajax({
-                url: API_BASEURL + "plugin/psucontrol",
+                url: API_BASEURL + "plugin/neopsucontrol",
                 type: "POST",
                 dataType: "json",
                 data: JSON.stringify({
@@ -123,8 +123,8 @@ $(function() {
     }
 
     ADDITIONAL_VIEWMODELS.push([
-        PSUControlViewModel,
+        NeoPSUControlViewModel,
         ["settingsViewModel", "loginStateViewModel"],
-        ["#navbar_plugin_psucontrol", "#settings_plugin_psucontrol"]
+        ["#navbar_plugin_neopsucontrol", "#settings_plugin_neopsucontrol"]
     ]);
 });

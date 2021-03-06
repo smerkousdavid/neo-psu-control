@@ -1,4 +1,5 @@
-# OctoPrint PSU Control
+# Neo PSU Control
+**Not to be mistaken for the Octoprint PSU control which is designed for the raspberry PI. This is only to work on Udoo NEOs**
 This OctoPrint plugin controls an ATX/AUX power supply to help reduce power consumption and noise when the printer is not in use.
 
 Power supply can be automatically switched on when user specified commands are sent to the printer and/or switched off when idle.
